@@ -16,11 +16,10 @@ This repo hosts an end-to-end pipeline, to process input data, perform analytics
 
 * Resources: `/res`
 
-* Source code: `/src`
-
-* Unit tests: `/test`
+* Source code: `/bmsb`
 
 * Miscellaneous tools: `/tools`
 
 ## Contributors
 Luke Zaruba
+Mattie Gisselbeck
