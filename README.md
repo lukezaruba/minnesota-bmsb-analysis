@@ -22,4 +22,5 @@ This repo hosts an end-to-end pipeline, to process input data, perform analytics
 
 ## Contributors
 Luke Zaruba
+<br>
 Mattie Gisselbeck
