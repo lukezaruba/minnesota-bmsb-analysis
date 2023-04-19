@@ -1,13 +1,6 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Sphinx documentation
-docs/_build/
-
-# Jupyter Notebook
+.DS_Store
 .ipynb_checkpoints
-
-# Environments
 .env
+.vscode
+data/
