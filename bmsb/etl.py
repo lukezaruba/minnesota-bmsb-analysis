@@ -218,7 +218,11 @@ class ObservationLoader:
 
         :param PathLike csv: Path to CSV of BMSB observations.
         """
-        self.df = pd.read_csv(csv)
+        try:
+            self.df = pd.read_csv(csv)
+
+        except:
+            self.df = pd.read_csv(csv, encoding="unicode_escape")
 
     def load(self, geodatabase: PathLike, fc_name: str) -> None:
         """Loads dataframe to feature class.
@@ -235,19 +239,18 @@ class ObservationLoader:
     def transform(self) -> None:
         """Cleans and transforms dataframe."""
         # Narrow Down Columns
-        self.df = self.df[
-            ["objectid", "ObsDate", "Latitude", "Longitude", "NumCollect"]
-        ].copy()
+        self.df = self.df[["objectid", "ObsDate", "Latitude", "Longitude"]].copy()
 
-        # Geometry QA
+        # Nulls
         self.df = self.df.dropna(subset=["Latitude", "Longitude"])
 
+        # Casting
+        self.df["ObsDate"] = self.df["ObsDate"].astype("datetime64[ns]")
+        self.df["Latitude"] = self.df["Latitude"].astype(float)
+        self.df["Longitude"] = self.df["Longitude"].astype(float)
+
+        # Geometry QA
         self.df = self.df.loc[self.df["Longitude"] > -97.5]
         self.df = self.df.loc[self.df["Longitude"] < -89.0]
         self.df = self.df.loc[self.df["Latitude"] > 43.0]
         self.df = self.df.loc[self.df["Latitude"] < 49.5]
-
-        # Count QA
-        self.df["NumCollect"].fillna(1, inplace=True)
-        self.df = self.df.loc[~self.df["NumCollect"] < 1]
-        self.df["NumCollect"] = self.df["NumCollect"].astype(int)
