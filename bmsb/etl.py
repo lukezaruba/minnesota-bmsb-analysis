@@ -212,3 +212,27 @@ class ObservationLoader:
 
     def transform(self):
         ...
+
+
+class Aggregator:
+    def __init__(self, cities, landcover, elevation, weather, observations) -> None:
+        self.cities = cities
+        self.landcover = landcover
+        self.elevation = elevation
+        self.weather = weather
+        self.observations = observations
+
+    @staticmethod
+    def raster_agg(raster, features, unique_id, table, quantitaive=True):
+        ...
+
+    @staticmethod
+    def point_agg_near(points, features, table):
+        ...
+
+    @staticmethod
+    def point_agg_within(points, features, table):
+        ...
+
+    def aggregate(self) -> None:
+        ...
