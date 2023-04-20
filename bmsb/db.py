@@ -5,6 +5,8 @@ import os
 
 import psycopg2
 
+from __future__ import annotations
+
 __author__ = "Luke Zaruba"
 __credits__ = ["Luke Zaruba", "Mattie Gisselbeck"]
 __status__ = "Production"

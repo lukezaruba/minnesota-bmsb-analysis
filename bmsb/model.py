@@ -3,7 +3,10 @@
 
 import os
 
+import arcgis
+import arcpy
 import pandas as pd
+from random import random
 
 from pandas import DataFrame
 from typing import List
@@ -14,8 +17,10 @@ __status__ = "Development"
 
 
 class Simulation:
-    def __init__(self) -> None:
-        ...
+    def __init__(self, features, gdb, table_name) -> None:
+        self.features = features
+        self.gdb = gdb
+        self.table_name = table_name
 
     def configure(self) -> None:
         ...
@@ -33,12 +38,12 @@ class Simulation:
             self._run_single_sim()
 
     @staticmethod
-    def _run_single_sim(self, df: DataFrame, starting_presence: List) -> None:
+    def _run_single_sim(df: DataFrame, starting_presence: List) -> None:
         # Loop through Rows & Simulate Transfer
         for index, row in df.iterrows():
             if row["StartPresence"] == 1:
                 # Generate Random Number
-                n = random.random()
+                n = random()
 
                 # Check if n < Huff
                 if n < row["Huff"]:
@@ -63,13 +68,6 @@ class Simulation:
         # Set starting presence to 1 for every city that had at least 1 ending presence
         # Get list of unique cities with ending preseence of 1, use that to select in the "from"
         # Reset ending presence to 0
-
-    def _calculate_lags(self) -> None:
-        ...
-
-        # arcpy.analysis.GenerateNearTable()
-
-        # Convert Dij to z-score
 
     def _calculate_weights(self) -> None:
         # Calculate Wi ("attractiveness")
