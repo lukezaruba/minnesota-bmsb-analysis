@@ -18,10 +18,6 @@ __credits__ = ["Luke Zaruba", "Mattie Gisselbeck"]
 __status__ = "Development"
 
 
-def load_raster():
-    ...
-
-
 class WeatherLoader:
     """
     A class used to extract and transform daily MN weather data automatically.
@@ -31,11 +27,11 @@ class WeatherLoader:
     multi_month(months, year)
         Class method. Runs extraction/transformation on multiple months.
     load(geodatabase, fc_name, df)
-        Static method. Loads df to geodatabase.
+        Static method. Loads DataFrame to geodatabase.
     _extractColumn(df, field)
         Static, private method. Used for converting JSON to DataFrame.
     extract()
-        Runs the extraction process for the data and returns as either JSON or DataFrame.
+        Runs the extraction process for the data and returns as DataFrame.
     transform()
         Performs QAQC Process on DataFrame.
     aggregate()
@@ -200,39 +196,58 @@ class WeatherLoader:
 
 
 class ObservationLoader:
-    def __init__(self):
-        ...
+    """
+    A class used to extract and transform BMSB observation data automatically.
 
-    @staticmethod
-    def load():
-        ...
+    Methods
+    -------
+    load(geodatabase, fc_name)
+        Loads DataFrame to geodatabase.
+    transform()
+        Performs QAQC Process on DataFrame.
 
-    def extract(self):
-        ...
+    Example
+    -------
+    > observation_etl = ObservationLoader(r"/path/to/example.csv")
+    > observation_etl.transform()
+    > observation_etl.load("/path/to/example.gdb", "feature_class")
+    """
 
-    def transform(self):
-        ...
+    def __init__(self, csv: PathLike) -> None:
+        """Initializes the ObservationLoader class.
 
+        :param PathLike csv: Path to CSV of BMSB observations.
+        """
+        self.df = pd.read_csv(csv)
 
-class Aggregator:
-    def __init__(self, cities, landcover, elevation, weather, observations) -> None:
-        self.cities = cities
-        self.landcover = landcover
-        self.elevation = elevation
-        self.weather = weather
-        self.observations = observations
+    def load(self, geodatabase: PathLike, fc_name: str) -> None:
+        """Loads dataframe to feature class.
 
-    @staticmethod
-    def raster_agg(raster, features, unique_id, table, quantitaive=True):
-        ...
+        :param PathLike geodatabase: Path to the geodatabase where the output feature class will be stored
+        :param str fc_name: Name of the output feature class
+        """
+        # Convert from DF to SEDF
+        sedf = arcgis.GeoAccessor.from_xy(self.df, "Longitude", "Latitude")
 
-    @staticmethod
-    def point_agg_near(points, features, table):
-        ...
+        # Convert Weather Observations from SEDF to FC
+        sedf.spatial.to_featureclass(location=os.path.join(geodatabase, fc_name))
 
-    @staticmethod
-    def point_agg_within(points, features, table):
-        ...
+    def transform(self) -> None:
+        """Cleans and transforms dataframe."""
+        # Narrow Down Columns
+        self.df = self.df[
+            ["objectid", "ObsDate", "Latitude", "Longitude", "NumCollect"]
+        ].copy()
 
-    def aggregate(self) -> None:
-        ...
+        # Geometry QA
+        self.df = self.df.dropna(subset=["Latitude", "Longitude"])
+
+        self.df = self.df.loc[self.df["Longitude"] > -97.5]
+        self.df = self.df.loc[self.df["Longitude"] < -89.0]
+        self.df = self.df.loc[self.df["Latitude"] > 43.0]
+        self.df = self.df.loc[self.df["Latitude"] < 49.5]
+
+        # Count QA
+        self.df["NumCollect"].fillna(1, inplace=True)
+        self.df = self.df.loc[~self.df["NumCollect"] < 1]
+        self.df["NumCollect"] = self.df["NumCollect"].astype(int)
