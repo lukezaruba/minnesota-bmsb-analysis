@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Establishes an easy-to-use interface for working with PostgreSQL database."""
 
+from __future__ import annotations
+
 import os
 
 import psycopg2
-
-from __future__ import annotations
 
 __author__ = "Luke Zaruba"
 __credits__ = ["Luke Zaruba", "Mattie Gisselbeck"]

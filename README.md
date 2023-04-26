@@ -8,8 +8,6 @@ This repo hosts an end-to-end pipeline, to process input data, perform analytics
 ## Structure
 * Datasets: `/data`
 
-* API documentation: `/doc`
-
 * Dockerfile for deploying API: `/docker`
 
 * Notebooks containing implementation of analysis: `/notebooks`
