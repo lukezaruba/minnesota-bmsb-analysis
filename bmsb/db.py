@@ -71,7 +71,7 @@ class Database:
             port=self.port,
         )
 
-    def query(self, query: str, user_input: str) -> str:
+    def query(self, query: str, user_input: int) -> str:
         """Executes a query on a database connection. A connection should already exist.
 
         :param str query: A SQL query that will be executed.
@@ -83,7 +83,7 @@ class Database:
             # Try to Execute
             try:
                 # Execute Query
-                c.execute(query, (user_input,))
+                c.execute(query, (int(user_input),))
 
                 # Commit to DB
                 self.connection.commit()
@@ -109,100 +109,101 @@ class Database:
 
 class Query:
     """
-    A class used to store SQL queries and format the results of queries.
-
-    Methods
-    -------
-    format(result)
-        Formats query output as a GeoJSON.
+    A class used to store SQL queries.
     """
 
     # Huff Simple Queries
     SIMPLE_HUFF_IN = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+    SELECT json_build_object(
+    'type', 'FeatureCollection',
+    'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY incoming DESC) as rank
+            FROM final_huff
         ) as rankings
         WHERE rank <= %s;
     """
     SIMPLE_HUFF_OUT = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY outgoing DESC) as rank
+            FROM final_huff
         ) as rankings
         WHERE rank <= %s;
     """
     SIMPLE_HUFF_RISK = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY risk DESC) as rank
+            FROM final_huff
         ) as rankings
         WHERE rank <= %s;
     """
 
     # Huff Decay Queries
     DECAY_HUFF_IN = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY incoming DESC) as rank
+            FROM final_huff_decay
         ) as rankings
         WHERE rank <= %s;
     """
     DECAY_HUFF_OUT = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY outgoing DESC) as rank
+            FROM final_huff_decay
         ) as rankings
         WHERE rank <= %s;
     """
     DECAY_HUFF_RISK = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY risk DESC) as rank
+            FROM final_huff_decay
         ) as rankings
         WHERE rank <= %s;
     """
 
     # Gravity Queries
     GRAVITY_IN = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY incoming DESC) as rank
+            FROM final_gravity
         ) as rankings
         WHERE rank <= %s;
     """
     GRAVITY_OUT = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY outgoing DESC) as rank
+            FROM final_gravity
         ) as rankings
         WHERE rank <= %s;
     """
     GRAVITY_RISK = """
-        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(rankings.*)::json))
         FROM (
-            SELECT *, RANK() OVER (ORDER BY <field>) as rank
-            FROM <table>
+            SELECT *, RANK() OVER (ORDER BY risk) as rank
+            FROM final_gravity
         ) as rankings
         WHERE rank <= %s;
     """
-
-    @staticmethod
-    def format(output: str) -> str:
-        # Alter Formatting
-        middle = str(output[0][0]).replace("'", "")
-        begin = """{"type": "FeatureCollection", "features": """
-        end = "}"
-
-        geojson = begin + middle + end
-
-        # Return New String
-        return geojson
