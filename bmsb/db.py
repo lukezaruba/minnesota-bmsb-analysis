@@ -71,10 +71,11 @@ class Database:
             port=self.port,
         )
 
-    def query(self, query: str) -> str:
+    def query(self, query: str, user_input: str) -> str:
         """Executes a query on a database connection. A connection should already exist.
 
         :param str query: A SQL query that will be executed.
+        :param str user_input: User input for query.
         :return str: The return from the SQL query.
         """
         # Open Cursor
@@ -82,7 +83,7 @@ class Database:
             # Try to Execute
             try:
                 # Execute Query
-                c.execute(query)
+                c.execute(query, (user_input,))
 
                 # Commit to DB
                 self.connection.commit()
@@ -95,7 +96,7 @@ class Database:
                 self.connection.rollback()
 
                 # Display Error
-                return "Error: " + e
+                return "Error: " + str(e)
 
     def close(self):
         """Closes connection to database."""
@@ -104,3 +105,104 @@ class Database:
 
         # Set Connection to None
         self.connection = None
+
+
+class Query:
+    """
+    A class used to store SQL queries and format the results of queries.
+
+    Methods
+    -------
+    format(result)
+        Formats query output as a GeoJSON.
+    """
+
+    # Huff Simple Queries
+    SIMPLE_HUFF_IN = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+    SIMPLE_HUFF_OUT = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+    SIMPLE_HUFF_RISK = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+
+    # Huff Decay Queries
+    DECAY_HUFF_IN = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+    DECAY_HUFF_OUT = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+    DECAY_HUFF_RISK = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+
+    # Gravity Queries
+    GRAVITY_IN = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+    GRAVITY_OUT = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+    GRAVITY_RISK = """
+        SELECT JSON_AGG(ST_asGeoJSON(rankings))
+        FROM (
+            SELECT *, RANK() OVER (ORDER BY <field>) as rank
+            FROM <table>
+        ) as rankings
+        WHERE rank <= %s;
+    """
+
+    @staticmethod
+    def format(output: str) -> str:
+        # Alter Formatting
+        middle = str(output[0][0]).replace("'", "")
+        begin = """{"type": "FeatureCollection", "features": """
+        end = "}"
+
+        geojson = begin + middle + end
+
+        # Return New String
+        return geojson
