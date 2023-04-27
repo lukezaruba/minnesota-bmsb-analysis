@@ -55,7 +55,7 @@ class HSIncoming(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.SIMPLE_HUFF_IN, top)
+        out = db.query(Query.SIMPLE_HUFF_IN, top)[0][0]
         db.close()
 
         # Return
@@ -70,7 +70,7 @@ class HSOutgoing(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.SIMPLE_HUFF_OUT, top)
+        out = db.query(Query.SIMPLE_HUFF_OUT, top)[0][0]
         db.close()
 
         # Return
@@ -85,7 +85,7 @@ class HSProbability(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.SIMPLE_HUFF_RISK, top)
+        out = db.query(Query.SIMPLE_HUFF_RISK, top)[0][0]
         db.close()
 
         # Return
@@ -101,7 +101,7 @@ class HDIncoming(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.DECAY_HUFF_IN, top)
+        out = db.query(Query.DECAY_HUFF_IN, top)[0][0]
         db.close()
 
         # Return
@@ -116,7 +116,7 @@ class HDOutgoing(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.DECAY_HUFF_OUT, top)
+        out = db.query(Query.DECAY_HUFF_OUT, top)[0][0]
         db.close()
 
         # Return
@@ -131,7 +131,7 @@ class HDProbability(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.DECAY_HUFF_RISK, top)
+        out = db.query(Query.DECAY_HUFF_RISK, top)[0][0]
         db.close()
 
         # Return
@@ -147,7 +147,7 @@ class GIncoming(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.GRAVITY_IN, top)
+        out = db.query(Query.GRAVITY_IN, top)[0][0]
         db.close()
 
         # Return
@@ -162,7 +162,7 @@ class GOutgoing(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.GRAVITY_OUT, top)
+        out = db.query(Query.GRAVITY_OUT, top)[0][0]
         db.close()
 
         # Return
@@ -177,7 +177,7 @@ class GProbability(Resource):
     def get(self, top):
         # Query
         db.connect()
-        out = db.query(Query.GRAVITY_RISK, top)
+        out = db.query(Query.GRAVITY_RISK, top)[0][0]
         db.close()
 
         # Return
