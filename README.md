@@ -1,6 +1,7 @@
 # `minnesota-bmsb-analysis`: Minnesota BMSB Analysis Pipeline
 
 ![Swagger Validator](https://img.shields.io/swagger/valid/3.0?specUrl=https://minnesota-bmsb-analysis-phdjlv4gpa-uc.a.run.app/api/v1/swagger.json)
+![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/lukezaruba/minnesota-bmsb-analysis)
 ![GitHub language count](https://img.shields.io/github/languages/count/lukezaruba/minnesota-bmsb-analysis)
 
