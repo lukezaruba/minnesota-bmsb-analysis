@@ -10,7 +10,7 @@ from db import Database, Query
 
 __author__ = "Luke Zaruba"
 __credits__ = ["Luke Zaruba", "Mattie Gisselbeck"]
-__status__ = "Development"
+__status__ = "Production"
 
 # Set up DB Connection
 db = Database.initialize_from_env()

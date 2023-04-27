@@ -16,6 +16,22 @@ __status__ = "Production"
 
 
 class Simulation:
+    """
+    A class used to simulate BMSB spread using different spatial interaction models.
+
+    Methods
+    -------
+    monte_carlo(model, num_sims, increase_prob)
+        Runs entire simulation a given number of times using a specified model.
+    _run_single_sim(probability_field, transition_cnt_field, starting_presence)
+        Private method. Used for running a single simulation.
+
+    Example
+    -------
+    > gravity_sim = Simulation(df)
+    > gravity_sim_df = gravity_sim.monte_carlo("GRAVITY_SIMPLE", 100, True)
+    """
+
     def __init__(
         self,
         df: DataFrame,
@@ -27,6 +43,17 @@ class Simulation:
         to_id_field="City: To",
         to_w_field="W: To",
     ) -> None:
+        """Initializes the Simulation class.
+
+        :param DataFrame df: Input dataframe for simulation
+        :param str dist_field: Name of series that represents lags, defaults to "Distance"
+        :param str from_presence_field: Name of series that represents origin presence, defaults to "BMSB Presence: From"
+        :param str from_id_field: Name of series that represents origin ID, defaults to "City: From"
+        :param str from_w_field: Name of series that represents origin weight, defaults to "W: From"
+        :param str to_presence_field: Name of series that represents destination presence, defaults to "BMSB Presence: To"
+        :param str to_id_field: Name of series that represents destination ID, defaults to "City: To"
+        :param str to_w_field: Name of series that represents destination weight, defaults to "W: To"
+        """
         self.df = df.copy()
         self.dist_field = dist_field
         self.from_presence_field = from_presence_field
@@ -37,12 +64,15 @@ class Simulation:
         self.to_w_field = to_w_field
 
     def monte_carlo(self, model: str, num_sims: int, increase_prob=False) -> DataFrame:
+        """Method used to run a monte carlo simulation.
+
+        :param str model: Name of model to use, options are ["HUFF_SIMPLE", "HUFF_DECAY", "GRAVITY_SIMPLE"]
+        :param int num_sims: The number of simulations that will be run
+        :param bool increase_prob: Determines whether probability is artificially inflated by 100x, defaults to False
+        :raises ValueError: Error raised when invalid model is passed
+        :return DataFrame: Simulation results
+        """
         # Get Initial List of Starting Presence
-        # starting_presence = list(
-        #    self.df.loc[self.df[self.from_presence_field] == 1][
-        #        self.from_presence_field
-        #    ]
-        # )
         starting_presence = list(self.df[self.from_presence_field])
 
         # Probability Fields
@@ -106,6 +136,12 @@ class Simulation:
     def _run_single_sim(
         self, probability_field: str, transition_cnt_field: str, starting_presence: List
     ) -> None:
+        """Private method used to run a simgle simulation.
+
+        :param str probability_field: Name of series that represents probability of transition
+        :param str transition_cnt_field: Name of series that represents transition count
+        :param List starting_presence: Name of series that represents list of starting presence
+        """
         # Loop through Rows & Simulate Transfer
         for index, row in self.df.iterrows():
             if row[self.from_presence_field] == 1:
